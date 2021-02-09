@@ -1,0 +1,55 @@
+---
+title: "Week 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor) # janitor helps us clean datasets
+library(here) # here helps us to know where files are
+
+```
+
+## Getting Data
+
+```{r COVID-19}
+COVID19data <- readr::read_csv(file ="https://data.ontario.ca/dataset/f4f86e54-872d-43f8-8a86-3892fd3cb5e6/resource/8a88fe6d-d8fb-41a3-9d04-f0550a44999f/download/daily_change_in_cases_by_phu.csv")
+```
+
+## Writing the data
+
+```{r}
+write_csv(COVID19data, here("dataset/COVID19data.csv"))
+```
+
+## cleaning the names of the columns
+```{r}
+COVID19data = janitor::clean_names(COVID19data)
+```
+
+## selecting few columns
+```{r}
+newCOVID19data = COVID19data %>% filter(algoma_public_health_unit >= 1) %>% select(date,algoma_public_health_unit,toronto_public_health)
+```
+## save a dataset
+```{r}
+readr::write_csv(newCOVID19data, "dataset/newCOVID19data.csv")
+```
+## making a graph
+```{r}
+COVID19data %>% ggplot(aes(x = date,y=toronto_public_health))+geom_point() + theme_minimal() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "date",y = "no of covid-19 patients") + scale_x_date(date_labels = "%Y %b %d")
+```
+```{r}
+COVID19data = COVID19data %>% arrange(date)
+```
+
+## group by and summarise
+```{r}
+COVID19data %>% group_by(date) %>% summarise(min = min(toronto_public_health),max = max(toronto_public_health),mean = mean(toronto_public_health))
+```
+
+```{r}
+COVID19data %>% ggplot(aes(x = date,y=toronto_public_health))+geom_smooth() + theme_minimal() + scale_color_december(palette = "xmas") + labs(x = "date",y = "no of covid-19 patients") + scale_x_date(date_labels = "%Y %b %d")
+```
+
