@@ -1,1 +1,1 @@
-# COMP-4066---Winter-2021
+# Code for COMP 4066 - Winter 2021
