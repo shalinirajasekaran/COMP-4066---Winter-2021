@@ -14,7 +14,12 @@ library(here) # here helps us to know where files are
 ## Getting Data
 
 ```{r COVID-19}
-COVID19data <- readr::read_csv(file ="https://data.ontario.ca/dataset/f4f86e54-872d-43f8-8a86-3892fd3cb5e6/resource/8a88fe6d-d8fb-41a3-9d04-f0550a44999f/download/daily_change_in_cases_by_phu.csv")
+COVID19data <- readr::read_csv(file ="https://data.ontario.ca/dataset/f4112442-bdc8-45d2-be3c-12efae72fb27/resource/455fd63b-603d-4608-8216-7d8647f43350/download/conposcovidloc.csv")
+```
+
+## Getting Data (2nd method)
+```{r}
+covid19 = read.csv(file = "https://data.ontario.ca/dataset/f4f86e54-872d-43f8-8a86-3892fd3cb5e6/resource/8a88fe6d-d8fb-41a3-9d04-f0550a44999f/download/daily_change_in_cases_by_phu.csv" )
 ```
 
 ## Writing the data
@@ -22,6 +27,31 @@ COVID19data <- readr::read_csv(file ="https://data.ontario.ca/dataset/f4f86e54-8
 ```{r}
 write_csv(COVID19data, here("dataset/COVID19data.csv"))
 ```
+
+## head operation
+
+```{r}
+head(covid19)
+```
+
+## selecting few columns
+```{r}
+covid19 %>% select(Date,Algoma_Public_Health_Unit,Brant_County_Health_Unit,Toronto_Public_Health)
+```
+
+## filtering rows (| will return when atleast one condition is met)
+```{r}
+covid19 %>% filter(Toronto_Public_Health >= 1 | Algoma_Public_Health_Unit >=1 |Durham_Region_Health_Department >=1)
+```
+## filtering rows (| will return when both conditions met)
+```{r}
+covid19 %>% filter(Toronto_Public_Health >= 1 & Algoma_Public_Health_Unit >=1 & Durham_Region_Health_Department >=1)
+```
+## group by function
+```{r}
+COVID19data %>% group_by(Case_AcquisitionInfo) %>% count(Case_AcquisitionInfo)
+```
+
 
 ## cleaning the names of the columns
 ```{r}
