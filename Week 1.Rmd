@@ -17,11 +17,6 @@ library(here) # here helps us to know where files are
 COVID19data <- readr::read_csv(file ="https://data.ontario.ca/dataset/f4112442-bdc8-45d2-be3c-12efae72fb27/resource/455fd63b-603d-4608-8216-7d8647f43350/download/conposcovidloc.csv")
 ```
 
-## Getting Data (2nd method)
-```{r}
-covid19 = read.csv(file = "https://data.ontario.ca/dataset/f4f86e54-872d-43f8-8a86-3892fd3cb5e6/resource/8a88fe6d-d8fb-41a3-9d04-f0550a44999f/download/daily_change_in_cases_by_phu.csv" )
-```
-
 ## Writing the data
 
 ```{r}
@@ -31,55 +26,68 @@ write_csv(COVID19data, here("dataset/COVID19data.csv"))
 ## head operation
 
 ```{r}
-head(covid19)
+head(COVID19data)
 ```
 
 ## selecting few columns
 ```{r}
-covid19 %>% select(Date,Algoma_Public_Health_Unit,Brant_County_Health_Unit,Toronto_Public_Health)
+COVID19data %>% select(Case_Reported_Date,Age_Group,Age_Group,Case_AcquisitionInfo,Reporting_PHU_City)
+```
+#now cleaning up the age column by removing "s"
+```{r}
+COVID19data$Age_Group = gsub("s","",COVID19data$Age_Group)
+COVID19data$Age_Group = as.numeric(COVID19data$Age_Group)
 ```
 
 ## filtering rows (| will return when atleast one condition is met)
 ```{r}
-covid19 %>% filter(Toronto_Public_Health >= 1 | Algoma_Public_Health_Unit >=1 |Durham_Region_Health_Department >=1)
+COVID19data %>% filter(Age_Group >= 30 | Client_Gender == "FEMALE")
 ```
 ## filtering rows (| will return when both conditions met)
 ```{r}
-covid19 %>% filter(Toronto_Public_Health >= 1 & Algoma_Public_Health_Unit >=1 & Durham_Region_Health_Department >=1)
+COVID19data %>% filter(Age_Group >= 30 & Client_Gender == "FEMALE")
 ```
 ## group by function
 ```{r}
-COVID19data %>% group_by(Case_AcquisitionInfo) %>% count(Case_AcquisitionInfo)
+COVID19data %>% group_by(Age_Group,Client_Gender) %>% count(Age_Group)
 ```
-
 
 ## cleaning the names of the columns
 ```{r}
 COVID19data = janitor::clean_names(COVID19data)
 ```
 
-## selecting few columns
+# graph
 ```{r}
-newCOVID19data = COVID19data %>% filter(algoma_public_health_unit >= 1) %>% select(date,algoma_public_health_unit,toronto_public_health)
+COVID19data %>% ggplot(mapping = aes(x = Age_Group,fill = Client_Gender)) + geom_bar()
 ```
-## save a dataset
+## Graph - label & heading - Facets are subplots and they allow you to add another variable to your plot without having to make a 3D plot.
 ```{r}
-readr::write_csv(newCOVID19data, "dataset/newCOVID19data.csv")
-```
-## making a graph
-```{r}
-COVID19data %>% ggplot(aes(x = date,y=toronto_public_health))+geom_point() + theme_minimal() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "date",y = "no of covid-19 patients") + scale_x_date(date_labels = "%Y %b %d")
-```
-```{r}
-COVID19data = COVID19data %>% arrange(date)
+
+COVID19data %>% group_by(Age_Group,Client_Gender) %>% ggplot(mapping = aes(x = Age_Group,fill = Client_Gender)) + geom_bar() + labs(title = "Total COVID-19 Positive cases in Ontario",x = "Age", Count = "Count") + theme_dark() + scale_fill_brewer(palette = "Set2") + facet_wrap(~Client_Gender)
 ```
 
-## group by and summarise
+## Left join
 ```{r}
-COVID19data %>% group_by(date) %>% summarise(min = min(toronto_public_health),max = max(toronto_public_health),mean = mean(toronto_public_health))
+Superstore_Sales <- read_excel("D:/George Brown College/2020/Health Informatics - COMP 4033 (May 2020)/data sets/Superstore Sales.xls")
+Superstore_Sales1 <- read_excel("D:/George Brown College/2020/Health Informatics - COMP 4033 (May 2020)/data sets/Superstore Sales.xls")
+newsuperstore = Superstore_Sales1 %>% left_join(Superstore_Sales,by = "Order ID")
+```
+
+## making a tibble - A tibble is a data frame, but it is a data frame with some particular changes that make it easier to work with.
+```{r}
+COVID19ontario = tibble(names = c("patient a","patient b","patient c"),covidpos = c("yes","no","yes"),datereported = c("02/02/2020","02/03/2020","04/08/2020"))
+```
+
+
+## Spotify code
+```{r}
+library(spotifyr)
+usethis::edit_r_environ()
 ```
 
 ```{r}
-COVID19data %>% ggplot(aes(x = date,y=toronto_public_health))+geom_smooth() + theme_minimal() + scale_color_december(palette = "xmas") + labs(x = "date",y = "no of covid-19 patients") + scale_x_date(date_labels = "%Y %b %d")
+
+radiohead <- get_artist_audio_features('radiohead')
 ```
 
